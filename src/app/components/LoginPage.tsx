@@ -173,7 +173,7 @@ const BottomBar = styled.div`
   transform: translateX(-50%);
 `;
 
-const LoginPage = ({ onComplete }: { onComplete?: () => void }) => {
+const LoginPage = ({ onComplete, onSwitchToSignUp }: { onComplete?: () => void, onSwitchToSignUp?: () => void }) => {
   const [isDark, setIsDark] = useState(false);
   const [showInterests, setShowInterests] = useState(false);
 
@@ -232,7 +232,10 @@ const LoginPage = ({ onComplete }: { onComplete?: () => void }) => {
 
       <SignUpText isDark={isDark}>
         Don't have an account?
-        <a href="#">Sign up</a>
+        <a href="#" onClick={(e) => {
+          e.preventDefault();
+          onSwitchToSignUp && onSwitchToSignUp();
+        }}>Sign up</a>
       </SignUpText>
 
       <BottomBar />

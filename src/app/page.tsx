@@ -47,7 +47,7 @@ export default function Home() {
   };
 
   const handleLoginComplete = () => {
-    setCurrentStage(FLOW_STAGES.SIGNUP);
+    setCurrentStage(FLOW_STAGES.INTERESTS);
   };
 
   const handleSignUpComplete = () => {
@@ -56,6 +56,14 @@ export default function Home() {
 
   const handleInterestsComplete = () => {
     setCurrentStage(FLOW_STAGES.HOME);
+  };
+
+  const switchToSignUp = () => {
+    setCurrentStage(FLOW_STAGES.SIGNUP);
+  };
+
+  const switchToLogin = () => {
+    setCurrentStage(FLOW_STAGES.LOGIN);
   };
 
   // Remove HomePage auto-splash - only run on client
@@ -86,9 +94,9 @@ export default function Home() {
         activeDot={1} 
         onGetStarted={handleOnboarding3Complete} />;
     case FLOW_STAGES.LOGIN:
-      return <LoginPage onComplete={handleLoginComplete} />;
+      return <LoginPage onComplete={handleLoginComplete} onSwitchToSignUp={switchToSignUp} />;
     case FLOW_STAGES.SIGNUP:
-      return <SignUpPage onComplete={handleSignUpComplete} />;
+      return <SignUpPage onComplete={handleSignUpComplete} onSwitchToLogin={switchToLogin} />;
     case FLOW_STAGES.INTERESTS:
       return <InterestsPage onComplete={handleInterestsComplete} />;
     case FLOW_STAGES.HOME:
