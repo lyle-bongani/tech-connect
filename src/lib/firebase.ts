@@ -43,18 +43,14 @@ const validateEnvVariables = () => {
 };
 
 // Your web app's Firebase configuration
-const getFirebaseConfig = () => {
-  validateEnvVariables();
-  
-  return {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyCCaSNHaWjZyTKL7tZLKzN5YnXbXKoZMM8",
+  authDomain: "tech-connect-469c7.firebaseapp.com",
+  projectId: "tech-connect-469c7",
+  storageBucket: "tech-connect-469c7.firebasestorage.app",
+  messagingSenderId: "910311971615",
+  appId: "1:910311971615:web:b61f4d435a7184f2e82e2a",
+  measurementId: "G-CZJ4E8HP59"
 };
 
 // Initialize Firebase
@@ -64,7 +60,7 @@ let db: ReturnType<typeof getFirestore> | null = null;
 
 try {
   if (!app) {
-    app = initializeApp(getFirebaseConfig());
+    app = initializeApp(firebaseConfig);
   }
   
   // Only initialize auth and db on the client side
