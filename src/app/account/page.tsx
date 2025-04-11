@@ -14,6 +14,9 @@ import {
   Email as EmailIcon
 } from '@mui/icons-material';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { logOut, getCurrentUserData, UserData } from '@/lib/firebase';
+import { useState, useEffect } from 'react';
 
 const Container = styled.div`
   background: white;
@@ -182,6 +185,45 @@ const MenuItemText = styled.span`
 `;
 
 export default function AccountPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const data = await getCurrentUserData();
+        if (!data) {
+          router.push('/'); // Redirect to login if no user data
+          return;
+        }
+        setUserData(data);
+      } catch (err) {
+        setError('Error fetching user data');
+        console.error('Error fetching user data:', err);
+      }
+    };
+
+    fetchUserData();
+  }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await logOut();
+      router.push('/'); // Redirect to home/login page after logout
+    } catch (error) {
+      console.error('Error logging out:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!userData) {
+    return <div>Loading...</div>; // You might want to create a proper loading component
+  }
+
   return (
     <Container>
       <Header>
@@ -197,31 +239,33 @@ export default function AccountPage() {
 
       <ProfileSection>
         <ProfileTop>
-          <ProfileImage src="/images/Ellipse 13.png" alt="David Chikanga" />
+          <ProfileImage src={userData.profileImage || "/images/Ellipse 13.png"} alt={userData.fullName} />
           <ProfileInfo>
-            <Name>David Chikanga</Name>
-            <Role>UI/UX Designer</Role>
+            <Name>{userData.fullName}</Name>
+            <Role>{userData.role || 'New Member'}</Role>
           </ProfileInfo>
         </ProfileTop>
         <ContactInfo>
-          <ContactItem>
-            <PhoneIcon sx={{ fontSize: 20, color: '#333', fontWeight: 500 }} />
-            <ContactText>+263 123456789</ContactText>
-          </ContactItem>
+          {userData.phoneNumber && (
+            <ContactItem>
+              <PhoneIcon sx={{ fontSize: 20, color: '#333', fontWeight: 500 }} />
+              <ContactText>{userData.phoneNumber}</ContactText>
+            </ContactItem>
+          )}
           <ContactItem>
             <EmailIcon sx={{ fontSize: 20, color: '#333', fontWeight: 500 }} />
-            <ContactText>example@gmail.com</ContactText>
+            <ContactText>{userData.email}</ContactText>
           </ContactItem>
         </ContactInfo>
       </ProfileSection>
 
       <StatsContainer>
         <StatCard>
-          <StatNumber>121</StatNumber>
+          <StatNumber>{userData.connections || 0}</StatNumber>
           <StatLabel>Connections</StatLabel>
         </StatCard>
         <StatCard>
-          <StatNumber>5</StatNumber>
+          <StatNumber>{userData.groupProjects || 0}</StatNumber>
           <StatLabel>Group Projects</StatLabel>
         </StatCard>
       </StatsContainer>
@@ -255,10 +299,13 @@ export default function AccountPage() {
           </MenuItemLeft>
           <ChevronRightIcon />
         </MenuItem>
-        <MenuItem>
+        <MenuItem 
+          onClick={handleLogout}
+          style={{ opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
+        >
           <MenuItemLeft>
             <LogoutIcon />
-            <MenuItemText>Log Out</MenuItemText>
+            <MenuItemText>{isLoading ? 'Logging out...' : 'Log Out'}</MenuItemText>
           </MenuItemLeft>
           <ChevronRightIcon />
         </MenuItem>
