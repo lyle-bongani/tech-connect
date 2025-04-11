@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports to prevent SSR issues
@@ -14,7 +14,7 @@ const HomePage = dynamic(() => import('./components/HomePage'), { ssr: false });
 
 export default function Home() {
   // Define the flow stages
-  const FLOW_STAGES = {
+  const FLOW_STAGES = useMemo(() => ({
     SPLASH: 'splash',
     ONBOARDING: 'onboarding',
     ONBOARDING3: 'onboarding3',
@@ -22,7 +22,7 @@ export default function Home() {
     SIGNUP: 'signup',
     INTERESTS: 'interests',
     HOME: 'home'
-  };
+  }), []);
 
   const [currentStage, setCurrentStage] = useState(FLOW_STAGES.SPLASH);
 
@@ -35,7 +35,7 @@ export default function Home() {
       
       return () => clearTimeout(timer);
     }
-  }, [currentStage]);
+  }, [currentStage, FLOW_STAGES.SPLASH, FLOW_STAGES.ONBOARDING]);
 
   // Custom handlers for each page
   const handleOnboardingComplete = () => {

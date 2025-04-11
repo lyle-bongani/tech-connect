@@ -4,24 +4,11 @@ import dynamic from 'next/dynamic';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
 import { 
-  Home as HomeFilledIcon,
-  Groups as GroupsFilledIcon,
-  Chat as ChatFilledIcon,
-  Person as PersonFilledIcon,
-  AccountCircle as AccountCircleFilledIcon,
   NotificationsNone as NotificationsIcon,
   MoreHoriz as MoreHorizIcon,
   FavoriteBorder as HeartIcon,
   ChatBubbleOutline as CommentIcon,
   IosShare as ShareIcon
-} from '@mui/icons-material';
-
-import {
-  HomeOutlined as HomeOutlinedIcon,
-  GroupsOutlined as GroupsOutlinedIcon,
-  ChatOutlined as ChatOutlinedIcon,
-  PersonOutline as PersonOutlinedIcon,
-  AccountCircleOutlined as AccountCircleOutlinedIcon,
 } from '@mui/icons-material';
 
 import { useRouter } from 'next/navigation';
