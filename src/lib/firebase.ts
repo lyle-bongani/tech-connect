@@ -24,22 +24,73 @@ import {
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
+// Validate required environment variables
+const validateEnvVariables = () => {
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_FIREBASE_API_KEY',
+    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+    'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
+    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+    'NEXT_PUBLIC_FIREBASE_APP_ID'
+  ];
+
+  for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar]) {
+      throw new Error(`Missing required environment variable: ${envVar}`);
+    }
+  }
+};
+
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+const getFirebaseConfig = () => {
+  validateEnvVariables();
+  
+  return {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  };
 };
 
 // Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-const auth = getAuth(app);
-const db = getFirestore(app);
+let app = getApps().length ? getApps()[0] : null;
+let auth: ReturnType<typeof getAuth> | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
+
+try {
+  if (!app) {
+    app = initializeApp(getFirebaseConfig());
+  }
+  
+  // Only initialize auth and db on the client side
+  if (typeof window !== 'undefined') {
+    auth = getAuth(app);
+    db = getFirestore(app);
+  }
+} catch (error) {
+  console.error('Error initializing Firebase:', error);
+  // Handle initialization error gracefully
+}
+
+// Ensure auth and db are initialized before use
+const getFirebaseAuth = () => {
+  if (!auth) {
+    throw new Error('Firebase Auth is not initialized');
+  }
+  return auth;
+};
+
+const getFirebaseDb = () => {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
+  return db;
+};
 
 // User type definition
 export interface UserData extends DocumentData {
@@ -77,23 +128,24 @@ const createUserDataInFirestore = async (user: User, fullName: string): Promise<
   };
 
   // Store user data in Firestore
-  const userRef = doc(db, 'Users', user.uid);
+  const firestore = getFirebaseDb();
+  const userRef = doc(firestore, 'Users', user.uid);
   await setDoc(userRef, userData);
 
   // Create empty collections for user's data
-  const connectionsRef = doc(db, 'Connections', user.uid);
+  const connectionsRef = doc(firestore, 'Connections', user.uid);
   await setDoc(connectionsRef, { 
     userConnections: [],
     createdAt: serverTimestamp()
   });
 
-  const notificationsRef = doc(db, 'Notifications', user.uid);
+  const notificationsRef = doc(firestore, 'Notifications', user.uid);
   await setDoc(notificationsRef, {
     notifications: [],
     lastChecked: serverTimestamp()
   });
 
-  const userInterestsRef = doc(db, 'UserInterests', user.uid);
+  const userInterestsRef = doc(firestore, 'UserInterests', user.uid);
   await setDoc(userInterestsRef, {
     interests: [],
     updatedAt: serverTimestamp()
@@ -104,13 +156,13 @@ const createUserDataInFirestore = async (user: User, fullName: string): Promise<
 
 // Authentication functions with Firestore integration
 export const signUp = async (email: string, password: string, fullName: string): Promise<User> => {
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const userCredential = await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
   await createUserDataInFirestore(userCredential.user, fullName);
   return userCredential.user;
 };
 
 export const signIn = async (email: string, password: string): Promise<User> => {
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  const userCredential = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
   return userCredential.user;
 };
 
@@ -118,7 +170,8 @@ export const getCurrentUserData = async (): Promise<UserData | null> => {
   const user = await getCurrentUser();
   if (!user) return null;
 
-  const userDoc = await getDoc(doc(db, 'Users', user.uid));
+  const firestore = getFirebaseDb();
+  const userDoc = await getDoc(doc(firestore, 'Users', user.uid));
   if (!userDoc.exists()) return null;
 
   return userDoc.data() as UserData;
@@ -126,7 +179,8 @@ export const getCurrentUserData = async (): Promise<UserData | null> => {
 
 export const updateUserData = async (userId: string, data: Partial<UserData>): Promise<void> => {
   try {
-    const userRef = doc(db, 'Users', userId);
+    const firestore = getFirebaseDb();
+    const userRef = doc(firestore, 'Users', userId);
     await updateDoc(userRef, {
       ...data,
       updatedAt: serverTimestamp()
@@ -140,12 +194,12 @@ export const updateUserData = async (userId: string, data: Partial<UserData>): P
 };
 
 export const logOut = async (): Promise<void> => {
-  await signOut(auth);
+  await signOut(getFirebaseAuth());
 };
 
 export const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve, reject) => {
-    const unsubscribe = onAuthStateChanged(auth, 
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), 
       (user) => {
         unsubscribe();
         resolve(user);
@@ -160,7 +214,7 @@ export const getCurrentUser = (): Promise<User | null> => {
 
 export const resetPassword = async (email: string): Promise<void> => {
   try {
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(getFirebaseAuth(), email);
   } catch (error) {
     console.error('Error sending password reset email:', error);
     if (error instanceof Error) {
