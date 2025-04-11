@@ -1,6 +1,5 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { 
   getAuth, 
   createUserWithEmailAndPassword,
@@ -8,7 +7,6 @@ import {
   signOut,
   onAuthStateChanged,
   User,
-  sendEmailVerification,
   sendPasswordResetEmail,
   AuthError
 } from "firebase/auth";
@@ -18,7 +16,6 @@ import {
   setDoc, 
   getDoc,
   updateDoc,
-  collection,
   serverTimestamp,
   Timestamp,
   DocumentData,
@@ -41,7 +38,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 const auth = getAuth(app);
 const db = getFirestore(app);
 
