@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { 
   getAuth, 
   createUserWithEmailAndPassword,
@@ -24,24 +24,6 @@ import {
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Validate required environment variables
-const validateEnvVariables = () => {
-  const requiredEnvVars = [
-    'NEXT_PUBLIC_FIREBASE_API_KEY',
-    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
-    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
-    'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
-    'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
-    'NEXT_PUBLIC_FIREBASE_APP_ID'
-  ];
-
-  for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-      throw new Error(`Missing required environment variable: ${envVar}`);
-    }
-  }
-};
-
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCCaSNHaWjZyTKL7tZLKzN5YnXbXKoZMM8",
@@ -54,36 +36,33 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app = getApps().length ? getApps()[0] : null;
-let auth: ReturnType<typeof getAuth> | null = null;
-let db: ReturnType<typeof getFirestore> | null = null;
-
-try {
-  if (!app) {
-    app = initializeApp(firebaseConfig);
+function initializeFirebase() {
+  try {
+    return getApps().length ? getApp() : initializeApp(firebaseConfig);
+  } catch (error) {
+    console.error('Error initializing Firebase:', error);
+    throw error;
   }
-  
-  // Only initialize auth and db on the client side
-  if (typeof window !== 'undefined') {
-    auth = getAuth(app);
-    db = getFirestore(app);
-  }
-} catch (error) {
-  console.error('Error initializing Firebase:', error);
-  // Handle initialization error gracefully
 }
+
+// Initialize Firebase app
+const app = initializeFirebase();
+
+// Initialize Firebase services
+const auth = typeof window !== 'undefined' ? getAuth(app) : null;
+const db = typeof window !== 'undefined' ? getFirestore(app) : null;
 
 // Ensure auth and db are initialized before use
 const getFirebaseAuth = () => {
   if (!auth) {
-    throw new Error('Firebase Auth is not initialized');
+    throw new Error('Firebase Auth is not initialized or running on server side');
   }
   return auth;
 };
 
 const getFirebaseDb = () => {
   if (!db) {
-    throw new Error('Firebase Firestore is not initialized');
+    throw new Error('Firebase Firestore is not initialized or running on server side');
   }
   return db;
 };
