@@ -125,14 +125,6 @@ const Story = styled.div`
   gap: 4px;
 `;
 
-const StoryImage = styled.img`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1.5px solid #007AFF;
-`;
-
 const StoryName = styled.span`
   font-size: 10px;
   color: #666;

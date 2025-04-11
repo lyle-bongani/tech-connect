@@ -9,7 +9,8 @@ import {
   onAuthStateChanged,
   User,
   sendEmailVerification,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  AuthError
 } from "firebase/auth";
 import { 
   getFirestore, 
@@ -20,7 +21,8 @@ import {
   collection,
   serverTimestamp,
   Timestamp,
-  DocumentData
+  DocumentData,
+  FirestoreError
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -133,8 +135,11 @@ export const updateUserData = async (userId: string, data: Partial<UserData>): P
       ...data,
       updatedAt: serverTimestamp()
     });
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error) {
+    if (error instanceof FirestoreError) {
+      throw new Error(error.message);
+    }
+    throw new Error('An error occurred while updating user data');
   }
 };
 
@@ -160,10 +165,12 @@ export const getCurrentUser = (): Promise<User | null> => {
 export const resetPassword = async (email: string): Promise<void> => {
   try {
     await sendPasswordResetEmail(auth, email);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error sending password reset email:', error);
-    if (error.code === 'auth/user-not-found') {
-      throw new Error('No account found with this email address.');
+    if (error instanceof Error) {
+      if ((error as AuthError).code === 'auth/user-not-found') {
+        throw new Error('No account found with this email address.');
+      }
     }
     throw new Error('Failed to send password reset email. Please try again.');
   }

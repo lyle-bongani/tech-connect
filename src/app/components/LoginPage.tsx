@@ -7,11 +7,7 @@ import { signIn } from '@/lib/firebase';
 import { 
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-  LightbulbOutlined as LightbulbIcon,
-  Person as PersonIcon,
-  ArrowBack as ArrowBackIcon,
-  Email as EmailIcon,
-  Lock as LockIcon
+  LightbulbOutlined as LightbulbIcon
 } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -193,11 +189,6 @@ interface LoginPageProps {
   onSwitchToSignUp?: () => void;
 }
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
 const LoginPage = ({ onComplete, onSwitchToSignUp }: LoginPageProps) => {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -215,8 +206,12 @@ const LoginPage = ({ onComplete, onSwitchToSignUp }: LoginPageProps) => {
       await signIn(email, password);
       router.push('/home');
       if (onComplete) onComplete();
-    } catch (err) {
-      setError('Invalid email or password');
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Invalid email or password');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -3,23 +3,6 @@
 import styled from '@emotion/styled';
 import { NotificationsNone as NotificationsIcon } from '@mui/icons-material';
 import Link from 'next/link';
-import { 
-  Home as HomeFilledIcon,
-  Groups as GroupsFilledIcon,
-  Chat as ChatFilledIcon,
-  Person as PersonFilledIcon,
-  AccountCircle as AccountCircleFilledIcon,
-} from '@mui/icons-material';
-
-import {
-  HomeOutlined as HomeOutlinedIcon,
-  GroupsOutlined as GroupsOutlinedIcon,
-  ChatOutlined as ChatOutlinedIcon,
-  PersonOutline as PersonOutlinedIcon,
-  AccountCircleOutlined as AccountCircleOutlinedIcon,
-} from '@mui/icons-material';
-
-import { useRouter } from 'next/navigation';
 import BottomNavigation from './BottomNavigation';
 
 const Container = styled.div`
@@ -120,8 +103,6 @@ const BackButton = styled.button`
 `;
 
 const CommunityPage = () => {
-  const router = useRouter();
-
   const options = [
     {
       title: 'Event Listing',

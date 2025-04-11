@@ -183,7 +183,6 @@ export default function AccountPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -194,9 +193,9 @@ export default function AccountPage() {
           return;
         }
         setUserData(data);
-      } catch (err) {
-        setError('Error fetching user data');
-        console.error('Error fetching user data:', err);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        router.push('/'); // Redirect to login on error
       }
     };
 
