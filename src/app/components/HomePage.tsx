@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { 
   NotificationsNone as NotificationsIcon,
   MoreHoriz as MoreHorizIcon,
@@ -11,7 +12,6 @@ import {
   IosShare as ShareIcon
 } from '@mui/icons-material';
 
-import { useRouter } from 'next/navigation';
 import BottomNavigation from './BottomNavigation';
 
 const SplashScreen = dynamic(() => import('./SplashScreen'), {
@@ -333,7 +333,6 @@ const Action = styled.div`
 
 const HomePage = () => {
   const [showSplash, setShowSplash] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     // Client-side only code
@@ -375,7 +374,15 @@ const HomePage = () => {
               <NotificationIconWrapper>
                 <NotificationsIcon />
               </NotificationIconWrapper>
-              <ProfileImage src="/images/Ellipse 11.png" alt="Profile" />
+              <div style={{ position: 'relative', width: '32px', height: '32px' }}>
+                <Image 
+                  src="/images/Ellipse 11.png" 
+                  alt="Profile"
+                  width={32}
+                  height={32}
+                  style={{ borderRadius: '50%', objectFit: 'cover' }}
+                />
+              </div>
             </HeaderIcons>
           </Header>
 
@@ -385,7 +392,19 @@ const HomePage = () => {
               <StoriesContainer>
                 {stories.map((story) => (
                   <Story key={story.id}>
-                    <StoryImage src={story.image} alt={story.name} />
+                    <div style={{ position: 'relative', width: '48px', height: '48px' }}>
+                      <Image 
+                        src={story.image} 
+                        alt={story.name}
+                        width={48}
+                        height={48}
+                        style={{ 
+                          borderRadius: '50%', 
+                          objectFit: 'cover',
+                          border: '1.5px solid #007AFF'
+                        }}
+                      />
+                    </div>
                     <StoryName>{story.name}</StoryName>
                   </Story>
                 ))}
@@ -404,9 +423,45 @@ const HomePage = () => {
                     <MatchSubText>Over 500+ Mentors</MatchSubText>
                   </MatchTextGroup>
                   <MatchProfileGroup>
-                    <img src="/images/Ellipse 12.png" alt="Mentor 1" />
-                    <img src="/images/Ellipse 13.png" alt="Mentor 2" />
-                    <img src="/images/Ellipse 14.png" alt="Mentor 3" />
+                    <div style={{ position: 'relative', width: '28px', height: '28px', marginRight: '-12px' }}>
+                      <Image 
+                        src="/images/Ellipse 12.png" 
+                        alt="Mentor 1"
+                        width={28}
+                        height={28}
+                        style={{ 
+                          borderRadius: '50%', 
+                          objectFit: 'cover',
+                          border: '2px solid white'
+                        }}
+                      />
+                    </div>
+                    <div style={{ position: 'relative', width: '28px', height: '28px', marginRight: '-12px' }}>
+                      <Image 
+                        src="/images/Ellipse 13.png" 
+                        alt="Mentor 2"
+                        width={28}
+                        height={28}
+                        style={{ 
+                          borderRadius: '50%', 
+                          objectFit: 'cover',
+                          border: '2px solid white'
+                        }}
+                      />
+                    </div>
+                    <div style={{ position: 'relative', width: '28px', height: '28px' }}>
+                      <Image 
+                        src="/images/Ellipse 14.png" 
+                        alt="Mentor 3"
+                        width={28}
+                        height={28}
+                        style={{ 
+                          borderRadius: '50%', 
+                          objectFit: 'cover',
+                          border: '2px solid white'
+                        }}
+                      />
+                    </div>
                   </MatchProfileGroup>
                 </div>
                 <MatchButton>

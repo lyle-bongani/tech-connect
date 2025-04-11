@@ -193,23 +193,6 @@ const EventInfo = styled.div`
   padding: 12px;
 `;
 
-const EventTag = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
-  
-  img {
-    width: 14px;
-    height: 14px;
-  }
-  
-  span {
-    font-size: 12px;
-    color: #666;
-  }
-`;
-
 const EventTitle = styled.h3`
   font-size: 14px;
   font-weight: 600;

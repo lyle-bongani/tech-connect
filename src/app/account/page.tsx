@@ -175,11 +175,6 @@ const MenuItemLeft = styled.div`
   }
 `;
 
-const MenuItemIcon = styled.img`
-  width: 24px;
-  height: 24px;
-`;
-
 const MenuItemText = styled.span`
   font-size: 16px;
 `;

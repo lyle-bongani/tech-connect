@@ -201,6 +201,11 @@ interface SignUpPageProps {
   onSwitchToLogin?: () => void;
 }
 
+interface FormError {
+  message: string;
+  code?: string;
+}
+
 const SignUpPage = ({ onComplete, onSwitchToLogin }: SignUpPageProps) => {
   const router = useRouter();
   const [fullName, setFullName] = useState('');
@@ -210,10 +215,10 @@ const SignUpPage = ({ onComplete, onSwitchToLogin }: SignUpPageProps) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
+    setError('');
 
     try {
       if (!fullName || !email || !password) {
@@ -223,8 +228,9 @@ const SignUpPage = ({ onComplete, onSwitchToLogin }: SignUpPageProps) => {
       await signUp(email, password, fullName);
       router.push('/interests');
       if (onComplete) onComplete();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const error = err as FormError;
+      setError(error.message || 'An error occurred during sign up');
     } finally {
       setIsLoading(false);
     }

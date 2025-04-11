@@ -4,11 +4,7 @@ import styled from '@emotion/styled';
 import { 
   ArrowBack as ArrowBackIcon,
   Search as SearchIcon,
-  NotificationsNone as NotificationIcon,
-  Home as HomeIcon,
-  Chat as ChatIcon,
-  People as CommunityIcon,
-  Person as ProfileIcon
+  NotificationsNone as NotificationIcon
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { useRouter } from 'next/navigation';
@@ -6,7 +8,10 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   LightbulbOutlined as LightbulbIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  ArrowBack as ArrowBackIcon,
+  Email as EmailIcon,
+  Lock as LockIcon
 } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -188,6 +193,11 @@ interface LoginPageProps {
   onSwitchToSignUp?: () => void;
 }
 
+interface FormData {
+  email: string;
+  password: string;
+}
+
 const LoginPage = ({ onComplete, onSwitchToSignUp }: LoginPageProps) => {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -196,21 +206,17 @@ const LoginPage = ({ onComplete, onSwitchToSignUp }: LoginPageProps) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
+    setError('');
 
     try {
-      if (!email || !password) {
-        throw new Error('Please fill in all fields');
-      }
-
       await signIn(email, password);
       router.push('/home');
       if (onComplete) onComplete();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError('Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -280,7 +286,7 @@ const LoginPage = ({ onComplete, onSwitchToSignUp }: LoginPageProps) => {
         </SocialButtons>
 
         <SignUpText>
-          Don't have an account? <a onClick={onSwitchToSignUp}>Sign up</a>
+          Don&apos;t have an account? <a onClick={onSwitchToSignUp}>Sign up</a>
         </SignUpText>
       </Form>
     </Container>
